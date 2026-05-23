@@ -5,164 +5,266 @@ import re
 
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 
+# =========================
 # PAGE CONFIG
+# =========================
+
 st.set_page_config(
     page_title="Emotion Detection System",
     page_icon="🧠",
-    layout="centered"
+    layout="wide"
 )
 
+# =========================
 # LOAD MODEL
+# =========================
+
 model = joblib.load('emotion_model.pkl')
 vectorizer = joblib.load('tfidf_vectorizer.pkl')
 
+# =========================
 # STOPWORDS
+# =========================
+
 factory = StopWordRemoverFactory()
 stop_words = factory.get_stop_words()
 
+# =========================
 # HISTORY SESSION
+# =========================
+
 if "history" not in st.session_state:
 
     st.session_state.history = []
 
-# CLEANING
+# =========================
+# CLEANING FUNCTION
+# =========================
+
 def clean_text(text):
 
     text = str(text).lower()
 
-    # hapus URL
     text = re.sub(r"http\S+", "", text)
 
-    # hapus mention
     text = re.sub(r"@\w+", "", text)
 
-    # hapus simbol & angka
     text = re.sub(r"[^a-zA-Z\s]", "", text)
 
-    # tokenisasi
     words = text.split()
 
-    # hapus stopwords
     words = [word for word in words if word not in stop_words]
 
     return " ".join(words)
 
-# EMOJI
+# =========================
+# EMOTION DATA
+# =========================
+
 emotion_emoji = {
 
     "sadness": "😢",
-
     "happy": "😄",
-
     "anger": "😡",
-
     "fear": "😨",
-
     "love": "❤️"
 }
 
-# DESCRIPTION
 emotion_description = {
 
-    "sadness": "Teks menunjukkan kesedihan atau tekanan emosional.",
+    "sadness": "Tweet menunjukkan kesedihan atau tekanan emosional.",
 
-    "happy": "Teks menunjukkan kebahagiaan atau rasa senang.",
+    "happy": "Tweet menunjukkan kebahagiaan atau rasa senang.",
 
-    "anger": "Teks mengandung kemarahan atau frustrasi.",
+    "anger": "Tweet mengandung kemarahan atau frustrasi.",
 
-    "fear": "Teks menunjukkan rasa takut atau kecemasan.",
+    "fear": "Tweet menunjukkan rasa takut atau kecemasan.",
 
-    "love": "Teks mengandung kasih sayang atau rasa cinta."
+    "love": "Tweet mengandung kasih sayang atau rasa cinta."
 }
 
-# COLOR
 emotion_color = {
 
-    "sadness": "#4dabf7",
+    "sadness": "#38bdf8",
 
-    "happy": "#ffd43b",
+    "happy": "#facc15",
 
-    "anger": "#ff6b6b",
+    "anger": "#ef4444",
 
-    "fear": "#9775fa",
+    "fear": "#8b5cf6",
 
-    "love": "#ff4d6d"
+    "love": "#ec4899"
 }
 
+# =========================
 # CUSTOM CSS
+# =========================
+
 st.markdown("""
 <style>
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+html, body, [class*="css"]  {
+    font-family: 'Poppins', sans-serif;
+}
+
 .stApp {
-    background-color: #0f172a;
+
+    background: linear-gradient(
+        135deg,
+        #0f172a,
+        #111827,
+        #1e293b
+    );
+
     color: white;
 }
 
-.title {
+.main-title {
+
+    font-size: 52px;
+
+    font-weight: 700;
+
     text-align: center;
-    font-size: 42px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: white;
+
+    margin-top: 20px;
+
+    background: linear-gradient(to right, #60a5fa, #c084fc);
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
+
     text-align: center;
+
     color: #cbd5e1;
+
     margin-bottom: 40px;
+
+    font-size: 18px;
 }
 
 .result-card {
-    padding: 25px;
-    border-radius: 20px;
-    margin-top: 20px;
-    color: white;
+
+    padding: 30px;
+
+    border-radius: 25px;
+
     text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    box-shadow: 0px 4px 20px rgba(0,0,0,0.3);
-}
 
-.description {
-    font-size: 17px;
-    margin-top: 10px;
-    font-weight: normal;
-}
-
-textarea {
-    border-radius: 15px !important;
-}
-
-div.stButton > button {
-    width: 100%;
-    border-radius: 12px;
-    height: 50px;
-    font-size: 18px;
-    font-weight: bold;
-    background-color: #2563eb;
     color: white;
-    border: none;
+
+    margin-top: 20px;
+
+    box-shadow: 0px 10px 35px rgba(0,0,0,0.35);
+
+    animation: fadeIn 0.5s ease-in-out;
 }
 
-div.stButton > button:hover {
-    background-color: #1d4ed8;
-    color: white;
+.metric-card {
+
+    background: rgba(255,255,255,0.08);
+
+    padding: 20px;
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255,255,255,0.1);
+
+    margin-bottom: 15px;
 }
 
 .history-card {
-    background-color: #1e293b;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 10px;
+
+    background: rgba(255,255,255,0.08);
+
+    padding: 18px;
+
+    border-radius: 18px;
+
+    margin-bottom: 15px;
+
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+textarea {
+
+    border-radius: 20px !important;
+
+    background-color: rgba(255,255,255,0.05) !important;
+
+    color: white !important;
+}
+
+div.stButton > button {
+
+    width: 100%;
+
+    height: 55px;
+
+    border-radius: 16px;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+    border: none;
+
+    background: linear-gradient(
+        to right,
+        #3b82f6,
+        #8b5cf6
+    );
+
     color: white;
+
+    transition: 0.3s;
+}
+
+div.stButton > button:hover {
+
+    transform: scale(1.02);
+
+    opacity: 0.9;
+}
+
+@keyframes fadeIn {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(10px);
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+    }
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# TITLE
+# =========================
+# HEADER
+# =========================
+
 st.markdown(
-    "<div class='title'>🧠 Emotion Detection System</div>",
+    "<div class='main-title'>🧠 Emotion Detection System</div>",
     unsafe_allow_html=True
 )
 
@@ -171,143 +273,206 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# INPUT
-user_input = st.text_area(
-    "Masukkan Tweet",
-    height=150,
-    placeholder="Contoh: aku takut gagal ujian besok..."
-)
+# =========================
+# LAYOUT
+# =========================
 
-# BUTTON
-if st.button("🔍 Prediksi Emosi"):
+left_col, right_col = st.columns([2,1])
 
-    if user_input.strip() == "":
+# =========================
+# LEFT COLUMN
+# =========================
 
-        st.warning("Masukkan teks terlebih dahulu.")
+with left_col:
+
+    user_input = st.text_area(
+        "Masukkan Tweet",
+        height=220,
+        placeholder="contoh: aku capek banget sama semuanya hari ini..."
+    )
+
+    if st.button("🔍 Prediksi Emosi"):
+
+        if user_input.strip() == "":
+
+            st.warning("Masukkan teks terlebih dahulu.")
+
+        else:
+
+            cleaned = clean_text(user_input)
+
+            vectorized = vectorizer.transform([cleaned])
+
+            prediction = model.predict(vectorized)[0]
+
+            probabilities = model.predict_proba(vectorized)[0]
+
+            color = emotion_color[prediction]
+
+            emoji = emotion_emoji[prediction]
+
+            description = emotion_description[prediction]
+
+            top_probability = round(
+                max(probabilities) * 100,
+                2
+            )
+
+            # RESULT CARD
+
+            st.markdown(
+                f"""
+                <div class='result-card'
+                style='background:{color};'>
+
+                <h1 style='font-size:60px;'>
+                {emoji}
+                </h1>
+
+                <h2>
+                {prediction.upper()}
+                </h2>
+
+                <p style='font-size:18px;'>
+                {description}
+                </p>
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # METRICS
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+
+                st.markdown(
+                    f"""
+                    <div class='metric-card'>
+
+                    <h3>Confidence</h3>
+
+                    <h1>{top_probability}%</h1>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            with col2:
+
+                st.markdown(
+                    f"""
+                    <div class='metric-card'>
+
+                    <h3>Detected Emotion</h3>
+
+                    <h1>{emoji}</h1>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            # CHART
+
+            prob_df = pd.DataFrame({
+
+                "Emotion": model.classes_,
+
+                "Probability": probabilities
+
+            })
+
+            prob_df = prob_df.sort_values(
+                by="Probability",
+                ascending=False
+            )
+
+            st.subheader("📊 Probability Distribution")
+
+            st.bar_chart(
+                prob_df.set_index("Emotion")
+            )
+
+            # PREPROCESSING
+
+            with st.expander("🧹 Lihat Hasil Preprocessing"):
+
+                st.code(cleaned)
+
+            # SAVE HISTORY
+
+            st.session_state.history.append({
+
+                "text": user_input,
+
+                "emotion": prediction,
+
+                "confidence": top_probability
+            })
+
+# =========================
+# RIGHT COLUMN
+# =========================
+
+with right_col:
+
+    st.subheader("🕘 Prediction History")
+
+    if len(st.session_state.history) == 0:
+
+        st.info("Belum ada history prediksi.")
 
     else:
 
-        # CLEAN TEXT
-        cleaned = clean_text(user_input)
+        for item in reversed(
+            st.session_state.history[-5:]
+        ):
 
-        # VECTORIZER
-        vectorized = vectorizer.transform([cleaned])
+            emoji = emotion_emoji[item["emotion"]]
 
-        # PREDICTION
-        prediction = model.predict(vectorized)[0]
+            st.markdown(
+                f"""
+                <div class='history-card'>
 
-        probabilities = model.predict_proba(vectorized)[0]
+                <b>{emoji} {item['emotion'].upper()}</b>
 
-        # UI DATA
-        color = emotion_color[prediction]
+                <br><br>
 
-        emoji = emotion_emoji[prediction]
+                {item['text']}
 
-        description = emotion_description[prediction]
+                <br><br>
 
-        # RESULT CARD
-        st.markdown(
-            f"""
-            <div class='result-card' style='background-color:{color};'>
-                {emoji} Emosi Terdeteksi: {prediction.upper()}
-                <div class='description'>
-                    {description}
+                Confidence:
+                <b>{item['confidence']}%</b>
+
                 </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                """,
+                unsafe_allow_html=True
+            )
 
-        # PREPROCESSING
-        with st.expander("🧹 Lihat Hasil Preprocessing"):
+        if st.button("🗑️ Clear History"):
 
-            st.code(cleaned)
+            st.session_state.history = []
 
-        # PROBABILITY DATAFRAME
-        prob_df = pd.DataFrame({
+            st.rerun()
 
-            'Emotion': model.classes_,
-
-            'Probability': probabilities
-
-        })
-
-        # SORT DESC
-        prob_df = prob_df.sort_values(
-            by='Probability',
-            ascending=False
-        )
-
-        # CHART
-        st.subheader("📊 Probabilitas Prediksi")
-
-        st.bar_chart(
-            prob_df.set_index('Emotion')
-        )
-
-        # TOP CONFIDENCE
-        top_probability = round(
-            max(probabilities) * 100,
-            2
-        )
-
-        st.info(
-            f"Tingkat keyakinan model: {top_probability}%"
-        )
-
-        # SAVE HISTORY
-        st.session_state.history.append({
-
-            "text": user_input,
-
-            "emotion": prediction,
-
-            "confidence": top_probability
-
-        })
-
-# HISTORY
-if len(st.session_state.history) > 0:
-
-    st.subheader("🕘 Riwayat Prediksi")
-
-    for item in reversed(
-        st.session_state.history[-5:]
-    ):
-
-        st.markdown(f"""
-
-        <div class='history-card'>
-
-        <b>Teks:</b><br>
-        {item['text']}
-
-        <br><br>
-
-        <b>Emosi:</b>
-        {item['emotion']}
-
-        <br><br>
-
-        <b>Confidence:</b>
-        {item['confidence']}%
-
-        </div>
-
-        """, unsafe_allow_html=True)
-
-    # CLEAR HISTORY
-    if st.button("🗑️ Clear History"):
-
-        st.session_state.history = []
-
-        st.rerun()
-
+# =========================
 # FOOTER
+# =========================
+
 st.markdown("""
-<br>
+<br><br>
 <hr>
+
 <center>
-dibuat dengan penderitaan, kopi, dan machine learning ☕
+
+dibuat dengan machine learning,
+kopi,
+dan debugging yang tidak manusiawi ☕
+
 </center>
 """, unsafe_allow_html=True)
