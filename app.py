@@ -30,7 +30,7 @@ factory = StopWordRemoverFactory()
 stop_words = factory.get_stop_words()
 
 # =========================
-# HISTORY SESSION
+# SESSION HISTORY
 # =========================
 
 if "history" not in st.session_state:
@@ -45,14 +45,19 @@ def clean_text(text):
 
     text = str(text).lower()
 
+    # hapus URL
     text = re.sub(r"http\S+", "", text)
 
+    # hapus mention
     text = re.sub(r"@\w+", "", text)
 
+    # hapus simbol & angka
     text = re.sub(r"[^a-zA-Z\s]", "", text)
 
+    # tokenisasi
     words = text.split()
 
+    # hapus stopwords
     words = [word for word in words if word not in stop_words]
 
     return " ".join(words)
@@ -64,9 +69,13 @@ def clean_text(text):
 emotion_emoji = {
 
     "sadness": "😢",
+
     "happy": "😄",
+
     "anger": "😡",
+
     "fear": "😨",
+
     "love": "❤️"
 }
 
@@ -106,6 +115,7 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 html, body, [class*="css"]  {
+
     font-family: 'Poppins', sans-serif;
 }
 
@@ -131,7 +141,11 @@ html, body, [class*="css"]  {
 
     margin-top: 20px;
 
-    background: linear-gradient(to right, #60a5fa, #c084fc);
+    background: linear-gradient(
+        to right,
+        #60a5fa,
+        #c084fc
+    );
 
     -webkit-background-clip: text;
 
@@ -187,15 +201,19 @@ html, body, [class*="css"]  {
 
     background: rgba(255,255,255,0.08);
 
-    padding: 18px;
+    padding: 14px 16px;
 
-    border-radius: 18px;
+    border-radius: 16px;
 
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 
     backdrop-filter: blur(10px);
 
     border: 1px solid rgba(255,255,255,0.08);
+
+    line-height: 1.5;
+
+    word-wrap: break-word;
 }
 
 textarea {
@@ -280,7 +298,7 @@ st.markdown(
 left_col, right_col = st.columns([2,1])
 
 # =========================
-# LEFT COLUMN
+# LEFT SIDE
 # =========================
 
 with left_col:
@@ -299,14 +317,18 @@ with left_col:
 
         else:
 
+            # CLEAN TEXT
             cleaned = clean_text(user_input)
 
+            # TF-IDF
             vectorized = vectorizer.transform([cleaned])
 
+            # PREDICT
             prediction = model.predict(vectorized)[0]
 
             probabilities = model.predict_proba(vectorized)[0]
 
+            # UI DATA
             color = emotion_color[prediction]
 
             emoji = emotion_emoji[prediction]
@@ -367,7 +389,7 @@ with left_col:
                     f"""
                     <div class='metric-card'>
 
-                    <h3>Detected Emotion</h3>
+                    <h3>Emotion</h3>
 
                     <h1>{emoji}</h1>
 
@@ -376,20 +398,21 @@ with left_col:
                     unsafe_allow_html=True
                 )
 
-            # CHART
+            # PROBABILITY DATAFRAME
 
             prob_df = pd.DataFrame({
 
                 "Emotion": model.classes_,
 
                 "Probability": probabilities
-
             })
 
             prob_df = prob_df.sort_values(
                 by="Probability",
                 ascending=False
             )
+
+            # CHART
 
             st.subheader("📊 Probability Distribution")
 
@@ -415,7 +438,7 @@ with left_col:
             })
 
 # =========================
-# RIGHT COLUMN
+# RIGHT SIDE
 # =========================
 
 with right_col:
@@ -438,16 +461,24 @@ with right_col:
                 f"""
                 <div class='history-card'>
 
-                <b>{emoji} {item['emotion'].upper()}</b>
+                <div style='font-size:18px;font-weight:600;'>
 
-                <br><br>
+                {emoji} {item['emotion'].upper()}
+
+                </div>
+
+                <div style='margin-top:8px;font-size:15px;'>
 
                 {item['text']}
 
-                <br><br>
+                </div>
+
+                <div style='margin-top:10px;color:#cbd5e1;font-size:14px;'>
 
                 Confidence:
                 <b>{item['confidence']}%</b>
+
+                </div>
 
                 </div>
                 """,
