@@ -503,7 +503,7 @@ st.markdown("""
 
 dibuat dengan machine learning,
 kopi,
-dan debugging yang tidak manusiawi ☕
+dan deadline yang mepet ☕
 
 </center>
 """, unsafe_allow_html=True)
