@@ -162,7 +162,7 @@ div.stButton > button:hover {
 
 # TITLE
 st.markdown(
-    "<div class='title'>🧠 Emotion Detection AI</div>",
+    "<div class='title'>🧠 Emotion Detection System</div>",
     unsafe_allow_html=True
 )
 
