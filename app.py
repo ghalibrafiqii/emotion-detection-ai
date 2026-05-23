@@ -7,7 +7,7 @@ from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFacto
 
 # PAGE CONFIG
 st.set_page_config(
-    page_title="Emotion Detection AI",
+    page_title="Emotion Detection System",
     page_icon="🧠",
     layout="centered"
 )
